@@ -1,0 +1,56 @@
+// GRAMATICA ARREGLADA
+// er -> t '|' er | t   	( t ( '|'t)*)
+// t  -> f t | f			( f ( f)*)
+// f  -> g '?' | g '*' | g '+'
+// g  -> '(' er ')'
+//	| '.' | '^' | '$'
+//  | CHAR
+//
+
+let PDR = function() {
+ let parseER = function () {
+  let result = parseT();
+	if (lookahead.value === "|"){
+	getNextToken();
+	result2 = parseER();
+	return ["OR",[result,result2]];
+ }else {
+    return parseT();
+	}
+	}
+ let parseT = function() {
+	 if (lookahead){
+		let result = parseF();
+		getNextToken();
+		let result2 = parseT();
+		return result.concat(result2);
+	 }else{
+	 return parseF();
+	 }
+   }
+  let parseF = function(){
+   result = parseG();
+   if(lookahead.value === '?'){
+   return ["?", result];
+   }else if(lookahead.value === '*'){
+   return ["*", result];
+   }else if(lookahead.value === '+'){
+   return ["+", result];
+   }
+  }
+  
+  let parseG = function(){
+  if(lookahead.value === '(' ){
+   return parseER;
+  }else if(lookahead.value === '.'){
+  return ".";
+  }else if(lookahead.value === '^'){
+  return "^";
+  }else if (lookahead.value === '$'){
+  return "$";
+  }else if (lookahead.value === ^[.?$*+]){
+  return "CHAR"
+  }
+ }
+}
+
