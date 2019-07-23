@@ -1,0 +1,62 @@
+// GRAMATICA ORIGINAL
+// er -> er '|' er
+// | er er
+// | er '?' | er '+' | er '*'
+// | '(' er ')'
+// | '.' | '^' | '$'
+// | CHAR
+//
+// GRAMATICA ARREGLADA
+// er -> t '|' er | t   	( t ( '|'t)*)
+// t  -> f t | f			( f ( f)*)
+// f  -> g '?' | g '*' | g '+'
+// g  -> '(' er ')'
+//	| '.' | '^' | '$'
+//  | CHAR
+//
+
+//Por alguna razon no pilla el OR y siempre tiene que acabar por *,+,?
+
+er
+  = left:t OR:'|' right:t { 
+  		return ["OR",left,right] }
+ / t;
+
+t
+ = left:f right:t{
+ 		return left.concat(right);
+        }
+  / f;
+  
+ f
+  = left:g right:'?' {
+  	  if (right)
+       	return [right, left]
+      else{
+       return [left]
+       }
+  }
+  / left:g right:'*' {
+  	  if (right)
+       	return [right, left]
+      else{
+       return [left]
+       }
+  }
+  /left:g right:'+'{
+     if (right)
+       	return [right, left]
+      else{
+       return [left]
+       }
+  }
+  
+ g
+   = "("  left:er  ")" { return left}
+  / "." { return ["DOT"] }
+  / "^" { return ["^"] }
+  / "$" { return ["$"] }
+  / CHAR 
+ 
+CHAR
+= text: [a-z]+ {return text.join("")}
